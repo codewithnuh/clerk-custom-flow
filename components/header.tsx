@@ -3,7 +3,7 @@ import Link from "next/link";
 import React from "react";
 import { Button } from "./ui/button";
 import { useClerk } from "@clerk/nextjs";
-const Header = () => {
+const Header = ({ user }: { user: any }) => {
   const { signOut } = useClerk();
   return (
     <header className="container">
@@ -17,9 +17,13 @@ const Header = () => {
             <Link href={"/sign-in"}>Sign In</Link>
           </li>
           <li>
-            <Button onClick={() => void signOut({ redirectUrl: "/" })}>
-              Sign Out
-            </Button>
+            {user ? (
+              <Button onClick={() => void signOut({ redirectUrl: "/" })}>
+                Sign Out
+              </Button>
+            ) : (
+              ""
+            )}
           </li>
         </ul>
       </nav>

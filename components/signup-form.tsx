@@ -1,9 +1,10 @@
 "use client";
 import * as React from "react";
-import { useSignUp } from "@clerk/nextjs";
+import { useSignIn, useSignUp } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { OAuthStrategy } from "@clerk/types";
 import {
   Card,
   CardContent,
@@ -27,6 +28,7 @@ export function SignUpForm() {
   const [verifying, setVerifying] = React.useState(false);
   const [code, setCode] = React.useState("");
   const router = useRouter();
+  const { signIn } = useSignIn();
   // Handle submission of the sign-up form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +55,15 @@ export function SignUpForm() {
       // for more info on error handling
       console.error(JSON.stringify(err, null, 2));
     }
+  };
+  if (!signIn) return null;
+
+  const signInWith = (strategy: OAuthStrategy) => {
+    return signIn.authenticateWithRedirect({
+      strategy,
+      redirectUrl: "/sign-up/sso-callback",
+      redirectUrlComplete: "/",
+    });
   };
 
   // Handle the submission of the verification form
@@ -161,9 +172,6 @@ export function SignUpForm() {
             <Button type="submit" className="w-full">
               continue
             </Button>
-            <Button type="submit" variant="outline" className="w-full">
-              Login with Google
-            </Button>
           </div>
           <div className="mt-4 text-center text-sm">
             Don&apos;t have an account?{" "}
@@ -172,6 +180,13 @@ export function SignUpForm() {
             </Link>
           </div>
         </form>
+        <Button
+          onClick={() => signInWith("oauth_google")}
+          variant="outline"
+          className="w-full"
+        >
+          SignIn with Google
+        </Button>
       </CardContent>
     </Card>
   );
